@@ -1,0 +1,28 @@
+1. Page d'Accueil
+Description:
+
+Logo et Nom de l'Application: Affichage du logo et du nom de l'application en haut à gauche.
+Menu de Navigation: Options pour "Connexion", "Contacts", et "A-propos".
+Message de Bienvenue: Texte de bienvenue présentant la plateforme "Sakkou Xam Xam" comme un outil dédié à l'apprentissage des sciences avec des cours interactifs en sciences naturelles et chimiques.
+Boutons de Navigation: Deux boutons en bas pour accéder aux sections "SVT" (Sciences de la Vie et de la Terre) et "Chimie".
+2. Accueil Professeur
+Description:
+
+Menu Latéral: Affiche l'avatar, le nom, et l'email du professeur. Les options de navigation incluent "Mes statistiques", "Nouveau quiz", "Mes Quiz", et "Profil".
+Section Principale: Présente les statistiques du professeur, incluant le nombre de quiz, la note la plus élevée, la note la plus basse, le quiz le plus fait, et le quiz le moins fait.
+Bouton de Déconnexion: Un bouton en rouge pour se déconnecter de l'application.
+3. Accueil Administrateur
+Description:
+
+Menu Latéral: Affiche l'avatar, le nom, et l'email de l'administrateur. Les options de navigation incluent "Statistiques", "Nouveau Utilisateurs", "Liste-Utilisateur", "Liste Tps", "Liste des quiz", et "Demande & suggestion".
+Section Principale: Présente les statistiques globales du système, incluant le nombre de professeurs, la note la plus élevée, la note la plus basse, le quiz le plus fait avec des détails supplémentaires.
+Bouton de Déconnexion: Un bouton en rouge pour se déconnecter de l'application.
+4. Gestion des Suggestions et Demandes
+Description:
+
+Section des Suggestions: Liste des suggestions soumises par les utilisateurs, avec la possibilité de les lire.
+Section des Demandes: Liste des demandes des utilisateurs avec des actions possibles pour approuver ou désapprouver chaque demande.
+5. Formulaire d'Inscription Administrateur
+Description:
+
+Formulaire d'Inscription: Un formulaire permettant à l'administrateur de créer un nouveau compte utilisateur. Les champs incluent "Nom", "Prénom", "Téléphone", "Email", "Mot de passe", et "Confirmation de mot de passe", ainsi que le choix du profil utilisateur (Admin ou autre).

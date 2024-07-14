@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Création Alcanes</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+    #interface {
+      position: absolute;
+      top: 10px;
+      left: 48%;
+      display: flex;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="interface">
+    <div>
+      <p id="alcaneName" style="display: none;">Alcane : </p>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://threejs.org/examples/js/controls/DragControls.js"></script>
+  <script>
+    // Initialisation de la scène, de la caméra et du rendu
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Matériau pour les barres
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+
+    // Groupes pour les barres
+    const bol1 = new THREE.Group();
+    const bol2 = new THREE.Group();
+
+    // Création de la barre horizontale
+    const horizontalGeometry1 = new THREE.BoxGeometry(4, 0.2, 0.2);
+    const horizontalGeometry2 = new THREE.BoxGeometry(3.4, 0.2, 0.2);
+    const horizontalBar = new THREE.Mesh(horizontalGeometry1, material);
+    const horizontalBar2 = new THREE.Mesh(horizontalGeometry2, material);
+    bol2.add(horizontalBar2);
+    bol1.add(horizontalBar);
+
+    // Création des barres obliques
+    const obliqueGeometry = new THREE.BoxGeometry(2, 0.2, 0.2);
+    const obliqueGeometryThin = new THREE.BoxGeometry(2, 0.2, 0.08);
+
+    const obliqueBar1 = new THREE.Mesh(obliqueGeometryThin, material);
+    obliqueBar1.rotation.z = -Math.PI / 4;
+    obliqueBar1.position.set(-2.66, 0.68, 0);
+    const obliqueBar1B2 = new THREE.Mesh(obliqueGeometry, material);
+    obliqueBar1B2.rotation.z = -Math.PI / 4;
+    obliqueBar1B2.position.set(-2.3, 0.68, 0);
+    bol2.add(obliqueBar1B2);
+    bol1.add(obliqueBar1);
+
+    const obliqueBar2 = new THREE.Mesh(obliqueGeometry, material);
+    obliqueBar2.rotation.z = Math.PI / 4;
+    obliqueBar2.position.set(2.66, 0.7, 0);
+    const obliqueBar2B2 = new THREE.Mesh(obliqueGeometryThin, material);
+    obliqueBar2B2.rotation.z = Math.PI / 4;
+    obliqueBar2B2.position.set(2.42, 0.65, 0);
+    bol1.add(obliqueBar2);
+    bol2.add(obliqueBar2B2);
+
+    bol1.position.set(-10, -5, 0);
+    bol2.position.set(10, -5, 0);
+    scene.add(bol1);
+    scene.add(bol2);
+
+    // Création des atomes de carbone et d'hydrogène
+    const circleGeometryC = new THREE.CircleGeometry(0.4, 64);
+    const grisMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
+    const circleGeometryH = new THREE.CircleGeometry(0.2, 64);
+    const whiteMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+    // Fonction pour créer des textes
+    function createTextMesh(text, font, size, color) {
+      const textGeometry = new THREE.TextGeometry(text, {
+        font: font,
+        size: size,
+        height: 0.001,
+        curveSegments: 12,
+      });
+      const textMaterial = new THREE.MeshBasicMaterial({ color: color });
+      const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+      textGeometry.computeBoundingBox();
+      const offset = (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x) / 2;
+      textMesh.position.set(-offset, -offset, 0);
+      return textMesh;
+    }
+
+    // Création du cadre et des barres de soutien
+    const cadreGeometry = new THREE.BoxGeometry(25, 0.2, 0.2);
+    const barGeometry = new THREE.BoxGeometry(5, 0.2, 0.2);
+    const materialCadre = new THREE.MeshBasicMaterial({ color: 0x0000ff, transparent: true, opacity: 0.5 });
+    const cadreBar = new THREE.Mesh(cadreGeometry, materialCadre);
+    const bar1 = new THREE.Mesh(barGeometry, materialCadre);
+    bar1.rotation.z = Math.PI / 2;
+    const bar2 = new THREE.Mesh(barGeometry, materialCadre);
+    bar2.rotation.z = Math.PI / 2;
+    bar2.position.set(12.4, 2.4);
+    bar1.position.set(-12.4, 2.4);
+    scene.add(bar2);
+    scene.add(bar1);
+    const cadreBar2 = new THREE.Mesh(cadreGeometry, materialCadre);
+    cadreBar2.position.set(0, 5);
+    scene.add(cadreBar2);
+    scene.add(cadreBar);
+
+    // Ajout des atomes de carbone
+    const carbones = [];
+    for (let i = 0; i < 10; i++) {
+      const carbone = new THREE.Mesh(circleGeometryC, grisMaterial);
+      carbone.name = "movable";
+      carbones.push(carbone);
+      scene.add(carbone);
+    }
+    const carbonePositions = [
+      [-10.9, -4.4], [-11.7, -4.4], [-10.1, -4.4], [-9.3, -4.4], [-8.5, -4.4],
+      [-11.3, -3.7], [-10.5, -3.7], [-9.7, -3.7], [-8.9, -3.7], [-10.1, -3]
+    ];
+    carbones.forEach((carbone, i) => {
+      carbone.position.set(...carbonePositions[i]);
+    });
+
+    // Ajout des atomes d'hydrogène
+    const hydrogens = [];
+    for (let i = 0; i < 22; i++) {
+      const hydrogen = new THREE.Mesh(circleGeometryH, whiteMaterial);
+      hydrogen.name = "movable";
+      hydrogens.push(hydrogen);
+      scene.add(hydrogen);
+    }
+    const hydrogenPositions = [
+      [10, -4.62], [9.6, -4.62], [9.2, -4.62], [8.8, -4.62], [8.4, -4.62], [10.4, -4.62], [10.8, -4.62], [11.2, -4.62], [11.6, -4.62],
+      [11, -4.225], [10.6, -4.225], [10.2, -4.225], [9.8, -4.225], [9.4, -4.225], [9, -4.225], [8.6, -4.225], [11.4, -4.225],
+      [11.2, -3.83], [10.8, -3.83], [10.4, -3.83], [10, -3.83], [9.6, -3.83]
+    ];
+    hydrogens.forEach((hydrogen, i) => {
+      hydrogen.position.set(...hydrogenPositions[i]);
+    });
+
+    // Chargement de la police et ajout du texte "C" aux atomes de carbone et "H" aux atomes d'hydrogène
+    const loader = new THREE.FontLoader();
+    loader.load("https://threejs.org/examples/fonts/helvetiker_regular.typeface.json", function (font) {
+      carbones.forEach(carbone => {
+        const textMeshC = createTextMesh("C", font, 0.4, 0xffffff);
+        carbone.add(textMeshC);
+      });
+      hydrogens.forEach(hydrogen => {
+        const textMeshH = createTextMesh("H", font, 0.1, 0x000000);
+        hydrogen.add(textMeshH);
+      });
+    });
+
+// Fonction de mise à jour du comptage des atomes
+function updateCount() {
+  const carboneCount = countCarbonesBetweenBars();
+  const hydrogenCount = countHydrogeneBetweenBars();
+  const alcaneName = getAlcaneName(carboneCount, hydrogenCount);
+  const alcaneElement = document.getElementById('alcaneName');
+  const alcaneElement1 = document.getElementById('interface');
+  if (alcaneName !== '') {
+    alcaneElement.innerText = `Alcane : ${alcaneName}`;
+    alcaneElement.style.display = 'block';
+    alcaneElement1.style.display = 'block';
+  } else {
+    alcaneElement.style.display = 'none';
+    alcaneElement1.style.display = 'none';
+  }
+}
+
+// Fonction pour vérifier si un atome de carbone est entre les deux barres verticales
+function countCarbonesBetweenBars() {
+  const minY = 0;  // Position Y de la première barre horizontale
+  const maxY = 5;  // Position X de la deuxième barre
+
+  let count = 0;
+  carbones.forEach(carbone => {
+    if (carbone.position.y > minY && carbone.position.y < maxY) {
+      count++;
+    }
+  });
+
+  return count;
+}
+
+function countHydrogeneBetweenBars() {
+  const minY = 0;  // Position Y de la première barre horizontale
+  const maxY = 5;  // Position X de la deuxième barre
+
+  let count = 0;
+  hydrogens.forEach(hydrogen => {
+    if (hydrogen.position.y > minY && hydrogen.position.y < maxY) {
+      count++;
+    }
+  });
+
+  return count;
+}
+
+function getAlcaneName(carbones, hydrogens) {
+  let alkanes = '';
+
+  if (carbones == 1 && hydrogens == 4) {
+    alkanes = 'Méthane';
+  } else if (carbones == 2 && hydrogens == 6) {
+    alkanes = 'Éthane';
+  } else if (carbones == 3 && hydrogens == 8) {
+    alkanes = 'Propane';
+  } else if (carbones == 4 && hydrogens == 10) {
+    alkanes = 'Butane';
+  } else if (carbones == 5 && hydrogens == 12) {
+    alkanes = 'Pentane';
+  } else if (carbones == 6 && hydrogens == 14) {
+    alkanes = 'Hexane';
+  } else if (carbones == 7 && hydrogens == 16) {
+    alkanes = 'Heptane';
+  } else if (carbones == 8 && hydrogens == 18) {
+    alkanes = 'Octane';
+  } else if (carbones == 9 && hydrogens == 20) {
+    alkanes = 'Nonane';
+  } else if (carbones == 10 && hydrogens == 22) {
+    alkanes = 'Décane';
+  }
+  return alkanes;
+}
+
+// Gestion des événements de souris
+let isDragging = false;
+let selectedObject = null;
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function onMouseDown(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(scene.children);
+  if (intersects.length > 0 && intersects[0].object.name === "movable") {
+    selectedObject = intersects[0].object;
+    isDragging = true;
+  }
+}
+
+function onMouseMove(event) {
+  if (!isDragging) return;
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(scene.children, true);
+  if (intersects.length > 0) {
+    const intersect = intersects.find(intersect => intersect.object.name === "movable");
+    if (intersect) {
+      selectedObject.position.copy(intersect.point);
+    }
+  }
+}
+
+function onMouseUp() {
+  isDragging = false;
+  selectedObject = null;
+  updateCount();
+}
+
+window.addEventListener('mousemove', onMouseMove);
+window.addEventListener('mousedown', onMouseDown);
+window.addEventListener('mouseup', onMouseUp);
+
+// Positionnement de la caméra
+camera.position.z = 10;
+
+// Fonction d'animation
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// Gestion de la redimension du navigateur
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

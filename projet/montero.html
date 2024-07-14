@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test des Produits de Réaction</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      }
+
+      .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 2em;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .section {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .reaction-inputs {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+
+      .reaction-inputs select,
+      .reaction-inputs input {
+        margin: 0 5px;
+        padding: 12px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 1em;
+        min-width: 120px;
+        text-align: center;
+        transition: all 0.3s;
+      }
+
+      .reaction-inputs select:focus,
+      .reaction-inputs input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+      }
+
+      .reaction-inputs span {
+        margin: 0 10px;
+        font-size: 1.5em;
+        color: #333;
+      }
+
+      button {
+        margin-top: 20px;
+        padding: 12px;
+        width: 100%;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+      }
+
+      .result {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        font-size: 1.2em;
+        color: #333;
+        text-align: center;
+        transition: background-color 0.3s;
+      }
+
+      .result.correct {
+        background-color: #d4edda;
+        color: #155724;
+      }
+
+      .result.incorrect {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+
+      .result.unbalanced {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Equation bilan</h1>
+      <div class="section">
+        <input
+          type="text"
+          id="coeffAlcane"
+          placeholder="1"
+          size="2"
+          style="display: none"
+        />
+        <select id="alcane">
+          <option value="C1H4">Méthane (CH<sub>4</sub>)</option>
+          <option value="C2H6">Éthane (C<sub>2</sub>H<sub>6</sub>)</option>
+          <option value="C3H8">Propane (C<sub>3</sub>H<sub>8</sub>)</option>
+          <option value="C4H10">Butane (C<sub>4</sub>H<sub>10</sub>)</option>
+          <option value="C5H12">Pentane (C<sub>5</sub>H<sub>12</sub>)</option>
+          <option value="C6H14">Hexane (C<sub>6</sub>H<sub>14</sub>)</option>
+          <option value="C7H16">Heptane (C<sub>7</sub>H<sub>16</sub>)</option>
+          <option value="C8H18">Octane (C<sub>8</sub>H<sub>18</sub>)</option>
+          <option value="C9H20">Nonane (C<sub>9</sub>H<sub>20</sub>)</option>
+          <option value="C10H22">Décane (C<sub>10</sub>H<sub>22</sub>)</option>
+        </select>
+        <span>+</span>
+        <input type="text" id="coeffReactif1" placeholder="1" size="2" />
+        <select id="reactif1">
+          <option value="O2">O<sub>2</sub></option>
+          <option value="Cl2">Cl<sub>2</sub></option>
+          <option value="Br2">Br<sub>2</sub></option>
+        </select>
+        <span>→</span>
+        <input type="text" id="coeffProduit1" placeholder="1" size="2" />
+        <select id="produit1">
+          <option value="CO2">CO<sub>2</sub></option>
+          <option value="H2O">H<sub>2</sub>O</option>
+          <option value="CH3Cl">CH<sub>3</sub>Cl</option>
+          <option value="HCl">HCl</option>
+          <option value="CH3Br">CH<sub>3</sub>Br</option>
+          <option value="HBr">HBr</option>
+          <option value="C2H5Cl">C<sub>2</sub>H<sub>5</sub>Cl</option>
+          <option value="C2H5Br">C<sub>2</sub>H<sub>5</sub>Br</option>
+          <option value="C3H7Cl">C<sub>3</sub>H<sub>7</sub>Cl</option>
+          <option value="C4H9Cl">C<sub>4</sub>H<sub>9</sub>Cl</option>
+          <option value="C5H11Cl">C<sub>5</sub>H<sub>11</sub>Cl</option>
+          <option value="C6H13Cl">C<sub>6</sub>H<sub>13</sub>Cl</option>
+          <option value="C7H15Cl">C<sub>7</sub>H<sub>15</sub>Cl</option>
+          <option value="C8H17Cl">C<sub>8</sub>H<sub>17</sub>Cl</option>
+          <option value="C9H19Cl">C<sub>9</sub>H<sub>19</sub>Cl</option>
+          <option value="C10H21Cl">C<sub>10</sub>H<sub>21</sub>Cl</option>
+          <option value="C3H7Br">C<sub>3</sub>H<sub>7</sub>Br</option>
+          <option value="C4H9Br">C<sub>4</sub>H<sub>9</sub>Br</option>
+          <option value="C5H11Br">C<sub>5</sub>H<sub>11</sub>Br</option>
+          <option value="C6H13Br">C<sub>6</sub>H<sub>13</sub>Br</option>
+          <option value="C7H15Br">C<sub>7</sub>H<sub>15</sub>Br</option>
+          <option value="C8H17Br">C<sub>8</sub>H<sub>17</sub>Br</option>
+          <option value="C9H19Br">C<sub>9</sub>H<sub>19</sub>Br</option>
+          <option value="C10H21Br">C<sub>10</sub>H<sub>21</sub>Br</option>
+        </select>
+        <span>+</span>
+        <input type="text" id="coeffProduit2" placeholder="1" size="2" />
+        <select id="produit2">
+          <option value="CO2">CO<sub>2</sub></option>
+          <option value="H2O">H<sub>2</sub>O</option>
+          <option value="CH3Cl">CH<sub>3</sub>Cl</option>
+          <option value="HCl">HCl</option>
+          <option value="CH3Br">CH<sub>3</sub>Br</option>
+          <option value="HBr">HBr</option>
+          <option value="C2H5Cl">C<sub>2</sub>H<sub>5</sub>Cl</option>
+          <option value="C3H7Cl">C<sub>3</sub>H<sub>7</sub>Cl</option>
+          <option value="C4H9Cl">C<sub>4</sub>H<sub>9</sub>Cl</option>
+          <option value="C5H11Cl">C<sub>5</sub>H<sub>11</sub>Cl</option>
+          <option value="C6H13Cl">C<sub>6</sub>H<sub>13</sub>Cl</option>
+          <option value="C7H15Cl">C<sub>7</sub>H<sub>15</sub>Cl</option>
+          <option value="C8H17Cl">C<sub>8</sub>H<sub>17</sub>Cl</option>
+          <option value="C9H19Cl">C<sub>9</sub>H<sub>19</sub>Cl</option>
+          <option value="C10H21Cl">C<sub>10</sub>H<sub>21</sub>Cl</option>
+          <option value="C2H5Br">C<sub>2</sub>H<sub>5</sub>Br</option>
+          <option value="C3H7Br">C<sub>3</sub>H<sub>7</sub>Br</option>
+          <option value="C4H9Br">C<sub>4</sub>H<sub>9</sub>Br</option>
+          <option value="C5H11Br">C<sub>5</sub>H<sub>11</sub>Br</option>
+          <option value="C6H13Br">C<sub>6</sub>H<sub>13</sub>Br</option>
+          <option value="C7H15Br">C<sub>7</sub>H<sub>15</sub>Br</option>
+          <option value="C8H17Br">C<sub>8</sub>H<sub>17</sub>Br</option>
+          <option value="C9H19Br">C<sub>9</sub>H<sub>19</sub>Br</option>
+          <option value="C10H21Br">C<sub>10</sub>H<sub>21</sub>Br</option>
+        </select>
+      </div>
+      <button id="checkButton">Vérifier</button>
+      <div id="result-section1" class="result"></div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const alcaneSelect = document.getElementById("alcane");
+        const reactif1Select = document.getElementById("reactif1");
+        const produit1Select = document.getElementById("produit1");
+        const produit2Select = document.getElementById("produit2");
+        const coeffAlcane = document.getElementById("coeffAlcane");
+        const coeffReactif1 = document.getElementById("coeffReactif1");
+        const coeffProduit1 = document.getElementById("coeffProduit1");
+        const coeffProduit2 = document.getElementById("coeffProduit2");
+        const checkButton = document.getElementById("checkButton");
+        const resultSection1 = document.getElementById("result-section1");
+
+        checkButton.addEventListener("click", checkProduits);
+
+        function checkProduits() {
+          const alcane = alcaneSelect.value;
+          const reactif1 = reactif1Select.value;
+          const produit1 = produit1Select.value;
+          const produit2 = produit2Select.value;
+
+          const coeffA = parseInt(coeffAlcane.value) || 1;
+          const coeffR1 = parseFloat(coeffReactif1.value) || 1;
+          const coeffP1 = parseInt(coeffProduit1.value) || 1;
+          const coeffP2 = parseInt(coeffProduit2.value) || 1;
+
+          let correctProduits = [];
+          let balanced = false;
+
+          if (reactif1 === "O2") {
+            correctProduits = ["CO2", "H2O"];
+            const n = parseInt(alcane.match(/\d+/g)[0]);
+            const requiredO2 = (3 * n + 1) / 2;
+            if (coeffR1 === requiredO2 && coeffP1 === n && coeffP2 === n + 1) {
+              balanced = true;
+            }
+          } else if (reactif1 === "Cl2") {
+            if (alcane === "CH4") {
+              correctProduits = ["CH3Cl", "HCl"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C2H6") {
+              correctProduits = ["C2H5Cl", "HCl"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C3H8") {
+              correctProduits = ["C3H7Cl", "HCl"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C4H10") {
+              correctProduits = ["C4H9Cl", "HCl"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C5H12") {
+              correctProduits = ["C5H11Cl", "HCl"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C6H14") {
+              correctProduits = ["C6H13Cl", "HCl"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C7H16") {
+              correctProduits = ["C7H15Cl", "HCl"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C8H18") {
+              correctProduits = ["C8H17Cl", "HCl"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C9H20") {
+              correctProduits = ["C9H19Cl", "HCl"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C10H22") {
+              correctProduits = ["C10H21Cl", "HCl"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            }
+          } else if (reactif1 === "Br2") {
+            if (alcane === "CH4") {
+              correctProduits = ["CH3Br", "HBr"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C2H6") {
+              correctProduits = ["C2H5Br", "HBr"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C3H8") {
+              correctProduits = ["C3H7Br", "HBr"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C4H10") {
+              correctProduits = ["C4H9Br", "HBr"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C5H12") {
+              correctProduits = ["C5H11Br", "HBr"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C6H14") {
+              correctProduits = ["C6H13Br", "HBr"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C7H16") {
+              correctProduits = ["C7H15Br", "HBr"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C8H18") {
+              correctProduits = ["C8H17Br", "HBr"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C9H20") {
+              correctProduits = ["C9H19Br", "HBr"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            } else if (alcane === "C10H22") {
+              correctProduits = ["C10H21Br", "HBr"];
+              if (coeffR1 === 1 && coeffP1 === 1 && coeffP2 === 1) {
+                balanced = true;
+              }
+            }
+          }
+
+          if (
+            (produit1 === correctProduits[0] &&
+              produit2 === correctProduits[1]) ||
+            (produit1 === correctProduits[1] && produit2 === correctProduits[0])
+          ) {
+            if (balanced) {
+              resultSection1.textContent = "Correct et équilibré !";
+              resultSection1.style.color = "green";
+            } else {
+              resultSection1.textContent = "Correct mais non équilibré.";
+              resultSection1.style.color = "orange";
+            }
+          } else {
+            resultSection1.textContent = `Incorrect. Les produits corrects sont : ${correctProduits.join(
+              " + "
+            )}`;
+            resultSection1.style.color = "red";
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

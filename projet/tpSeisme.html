@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simulation de Séisme</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+
+      #controlPanel {
+        position: absolute;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        top: 20px;
+        left: 50px;
+        z-index: 100;
+        margin-left: 25%;
+        border: 5px solid black;
+        background-color: green;
+      }
+
+      button {
+        cursor: pointer;
+        padding: 10px;
+        margin: 5px;
+        border: 2px solid whitesmoke;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="controlPanel">
+      <div>
+        <label
+          style="
+            color: whitesmoke;
+            margin-left: 5px;
+            margin-top: -5px;
+            font-family: 'Times New Roman', Times, serif;
+          "
+          >Magnitude du seisme : </label
+        ><input
+          id="progress1"
+          class="progress-bar"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+          step="1"
+        />
+        <span id="progressValue1">0</span><br />
+      </div>
+      <br />
+      <div>
+        <button onclick="startEarthquake()" style="background-color: green">
+          Démarrer Séisme
+        </button>
+        <button onclick="stopEarthquake()" style="background-color: red">
+          Arrêter Séisme
+        </button>
+      </div>
+    </div>
+    <script>
+      const progressBar1 = document.getElementById("progress1");
+      const progressValue1 = document.getElementById("progressValue1");
+
+      // Mettre à jour les valeurs des barres de progression
+      progressBar1.addEventListener("input", function () {
+        progressValue1.textContent = this.value;
+      });
+    </script>
+
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+      camera.position.set(0, 100, 300);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const light = new THREE.DirectionalLight(0xffffff, 1.0);
+      light.position.set(50, 200, 100);
+      scene.add(light);
+
+      const group = new THREE.Group();
+      scene.add(group);
+
+      let planeV;
+      const loader = new THREE.TextureLoader();
+      loader.load("/grasslight-big.jpg", function (texture) {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(25, 25);
+        const planeVGeometry = new THREE.PlaneGeometry(530, 100);
+        const planeVMaterial = new THREE.MeshLambertMaterial({ map: texture });
+        planeV = new THREE.Mesh(planeVGeometry, planeVMaterial);
+        planeV.rotation.x = -Math.PI / 2;
+        planeV.position.set(15, 0, 0);
+        scene.add(planeV);
+      });
+
+      const terreGeometry = new THREE.BoxGeometry(600, 10, 50);
+      const terreMaterial = new THREE.MeshPhongMaterial({ color: 0x8b4513 });
+      const terre = new THREE.Mesh(terreGeometry, terreMaterial);
+      terre.position.set(15, -20, -11);
+      scene.add(terre);
+
+      const solGeometry = new THREE.BoxGeometry(70, 20, 2);
+      const solMaterial = new THREE.MeshPhongMaterial({ color: 0x8b4513 });
+      const sol = new THREE.Mesh(solGeometry, solMaterial);
+      const sol1 = new THREE.Mesh(solGeometry, solMaterial);
+      const sol2 = new THREE.Mesh(solGeometry, solMaterial);
+      sol.rotation.x = -Math.PI / 2;
+      sol1.rotation.x = -Math.PI / 2;
+      sol2.rotation.x = -Math.PI / 2;
+      sol.position.set(50, 0, 20);
+      sol1.position.set(-150, 0, 20);
+      sol2.position.set(200, 0, 20);
+      scene.add(sol);
+      scene.add(sol1);
+      scene.add(sol2);
+
+      const houseGeometry = new THREE.BoxGeometry(70, 40, 50);
+      const houseMaterial = new THREE.MeshPhongMaterial({ color: 0x8e44ad });
+      const house = new THREE.Mesh(houseGeometry, houseMaterial);
+      const house2 = new THREE.Mesh(houseGeometry, houseMaterial);
+      const house3 = new THREE.Mesh(houseGeometry, houseMaterial);
+      house.position.set(-150, 20, -10);
+      house2.position.set(50, 20, -10);
+      house3.position.set(200, 20, -10);
+      scene.add(house);
+      scene.add(house2);
+      scene.add(house3);
+
+      // Porte
+      const doorGeometry = new THREE.BoxGeometry(15, 30, 2);
+      const doorMaterial = new THREE.MeshPhongMaterial({ color: 0x784212 });
+      const door = new THREE.Mesh(doorGeometry, doorMaterial);
+      door.position.set(-150, 10, 20);
+      scene.add(door);
+      const door2 = new THREE.Mesh(doorGeometry, doorMaterial);
+      door2.position.set(50, 10, 20);
+      scene.add(door2);
+      const door3 = new THREE.Mesh(doorGeometry, doorMaterial);
+      door3.position.set(200, 10, 20);
+      scene.add(door3);
+
+      // Fenêtres
+      const windowGeometry = new THREE.BoxGeometry(15, 15, 2);
+      const windowMaterial = new THREE.MeshPhongMaterial({
+        color: 0x3498db,
+        opacity: 0.5,
+        transparent: true,
+      });
+      const window1 = new THREE.Mesh(windowGeometry, windowMaterial);
+      window1.position.set(-120, 25, 26);
+      scene.add(window1);
+
+      const window2 = new THREE.Mesh(windowGeometry, windowMaterial);
+      window2.position.set(30, 25, 26);
+      scene.add(window2);
+      const window3 = new THREE.Mesh(windowGeometry, windowMaterial);
+      window3.position.set(160, 35, 50);
+      scene.add(window3);
+
+      const planeGeometry = new THREE.PlaneGeometry(500, 100);
+      const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x707070 });
+      // const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+      // plane.rotation.x = -Math.PI / 2;
+      // scene.add(plane);
+
+      function createTree(x, z) {
+        const trunkGeometry = new THREE.CylinderGeometry(2, 2, 20);
+        const trunkMaterial = new THREE.MeshLambertMaterial({
+          color: 0x8b4513,
+        });
+        const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+        trunk.position.set(x, 10, z);
+        scene.add(trunk);
+
+        const foliageGeometry = new THREE.SphereGeometry(10, 16, 16);
+        const foliageMaterial = new THREE.MeshLambertMaterial({
+          color: 0x00ff00,
+        });
+        const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+        foliage.position.set(x, 25, z);
+        scene.add(foliage);
+        group.add(trunk);
+        group.add(foliage);
+      }
+      createTree(-55, 30);
+      createTree(-105, -10);
+      createTree(-170, 25);
+      createTree(-200, 30);
+      createTree(-125, 30);
+      createTree(-20, -5);
+      createTree(0, 30);
+      createTree(-40, 30);
+      createTree(-50, 0);
+      createTree(25, 0);
+      createTree(105, -30);
+      createTree(110, -25);
+      createTree(120, -30);
+      createTree(-210, 10);
+      createTree(25, 0);
+      group.add(house);
+      group.add(house2);
+      group.add(house3);
+      group.add(door);
+      group.add(door2);
+      group.add(door3);
+      group.add(window1);
+      group.add(window2);
+      group.add(window3);
+      group.add(sol);
+      group.add(sol1);
+      group.add(sol2);
+
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      animate();
+      function destroyHousesAndGenerateDebris() {
+        const debrisGeometry = new THREE.BoxGeometry(5, 5, 5);
+        const debrisMaterial = new THREE.MeshPhongMaterial({ color: 0x8b4513 });
+
+        function createDebris(x, y, z) {
+          const debris = new THREE.Mesh(debrisGeometry, debrisMaterial);
+          debris.position.set(x, y, z);
+          debris.rotation.set(
+            Math.random() * 2 * Math.PI,
+            Math.random() * 2 * Math.PI,
+            Math.random() * 2 * Math.PI
+          );
+          scene.add(debris);
+          group.add(debris);
+        }
+
+        // Positions des maisons
+        const housePositions = [
+          house.position,
+          house2.position,
+          house3.position,
+        ];
+
+        // Supprimer les maisons et créer des débris à leur place
+        housePositions.forEach((position) => {
+          group.remove(house);
+          group.remove(house2);
+          group.remove(house3);
+          group.remove(door);
+          group.remove(door2);
+          group.remove(door3);
+          group.remove(window1);
+          group.remove(window2);
+          group.remove(window3);
+
+          // Créer des débris autour de la position de la maison
+          for (let i = 0; i < 100; i++) {
+            const offsetX = (Math.random() - 0.5) * 50;
+            const offsetY = Math.random() * 20;
+            const offsetZ = (Math.random() - 0.5) * 50;
+            createDebris(position.x + offsetX, offsetY, position.z + offsetZ);
+          }
+        });
+      }
+      function fallTrees() {
+        const fallAnimation = anime.timeline({
+          easing: "easeInOutSine",
+          duration: 1000,
+        });
+
+        group.children.forEach((object) => {
+          if (
+            object.geometry instanceof THREE.CylinderGeometry &&
+            object.material.color.getHex() === 0x8b4513
+          ) {
+            fallAnimation.add(
+              {
+                targets: object.rotation,
+                x: (Math.random() * Math.PI) / 2 - Math.PI / 4, // Rotation aléatoire
+                y: (Math.random() * Math.PI) / 2 - Math.PI / 4, // Rotation aléatoire
+                delay: anime.stagger(3000), // Décalage entre les animations des arbres
+              },
+              "-=800"
+            ); // Démarre l'animation avant que l'autre se termine
+          }
+        });
+      }
+
+      let earthquakeAnimation;
+
+      function startEarthquake() {
+        shakeHorizontal();
+        setTimeout(() => {
+          destroyHousesAndGenerateDebris();
+        }, 15000);
+        setTimeout(() => {
+            fallTrees();
+        }, 13000);
+      }
+
+      function stopEarthquake() {
+        if (earthquakeAnimation) earthquakeAnimation.pause();
+      }
+
+      window.addEventListener("resize", function () {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      function shakeHorizontal() {
+        const magnitude = parseInt(progressBar1.value, 10);
+        const maxDuration = 300;
+        const minDuration = 50;
+        const duration =
+          maxDuration - (magnitude / 100) * (maxDuration - minDuration);
+
+        earthquakeAnimation = anime({
+          targets: [group.position, terre.position, planeV.position],
+          x: [
+            { value: -10, duration: duration },
+            { value: 10, duration: duration },
+            { value: 0, duration: duration },
+          ],
+          easing: "easeInOutSine",
+          loop: true,
+          duration: 900,
+          autoplay: false,
+        });
+        earthquakeAnimation.play();
+      }
+      progressBar1.addEventListener("input", function () {
+        progressValue1.textContent = this.value;
+        if (earthquakeAnimation) {
+          earthquakeAnimation.pause();
+          shakeHorizontal();
+        }
+      });
+    </script>
+  </body>
+</html>

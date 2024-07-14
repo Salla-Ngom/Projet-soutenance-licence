@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Roche Granite</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      canvas {
+        display: block;
+      }
+      .titre {
+        position: absolute;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        top: -5%;
+        left: 13%;
+        z-index: 100;
+        margin-left: 25%;
+        width: 400px;
+        font-size: 3rem;
+      }
+      .bouton{
+        position: absolute;
+        top: 75%;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        margin-left: 50%;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.139.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.139.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.139.0/examples/js/controls/OrbitControls.js"></script>
+  </head>
+  <body>
+    <div id="affichage">
+      <div class="titre">
+        <h1>Granite</h1>
+      </div>
+      <div class="bouton">
+        <button onclick="retour()" style="background-color: green;">Retour</button>
+      </div>
+    </div>
+    <script>
+      function retour() {
+        window.location.href = "/tpFormationGranite.html";
+        }
+      // Initialisation des variables globales pour la scène, la caméra, le rendu et le modèle 3D.
+      let scene, camera, renderer, heartMesh;
+
+      // Fonction d'initialisation pour configurer la scène, la caméra, les lumières, charger les modèles 3D et ajouter le gestionnaire de redimensionnement.
+      function init() {
+        // Création de la scène 3D où tous les objets seront placés.
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xadd8e6); // Définition de la couleur de fond de la scène.
+
+        // Configuration de la caméra avec un champ de vision, un rapport largeur/hauteur, et des plans de clipping proche et lointain.
+        camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        camera.position.z = 30; // Définition de la position initiale de la caméra.
+
+        // Création du renderer WebGL qui dessinera la scène dans le navigateur.
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight); // Définition de la taille du rendu.
+        document.body.appendChild(renderer.domElement); // Ajout du rendu au corps du document HTML.
+
+        // Ajout d'une lumière ambiante qui illumine tous les objets de la scène de manière égale.
+        const light = new THREE.AmbientLight(0x404040); // Lumière douce blanche.
+        scene.add(light);
+
+        // Ajout d'une lumière directionnelle pour plus de réalisme, créant des ombres et des éclairages directionnels.
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        scene.add(directionalLight);
+
+        // Chargement du modèle 3D avec GLTFLoader.
+        const loader = new THREE.GLTFLoader();
+        loader.load(
+          "/granite_rock_yellowish_brown.glb",
+          function (gltf) {
+            heartMesh = gltf.scene.children[0]; // Sélection du premier enfant du modèle chargé.
+           heartMesh.scale.set(0.01, 0.01, 0.01); // Agrandissement du modèle 3D pour une meilleure visibilité.
+            scene.add(heartMesh); // Ajout du modèle à la scène.
+            animate(); // Lancement de la boucle d'animation une fois le modèle chargé.
+          },
+          undefined,
+          function (error) {
+            console.error("An error happened", error); // Affichage des erreurs de chargement dans la console.
+          }
+        );
+
+        // Création des contrôles de la caméra pour permettre une interaction avec la souris.
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // Ajout d'un gestionnaire d'événements pour ajuster la caméra et le rendu lorsque la fenêtre est redimensionnée.
+        window.addEventListener("resize", onWindowResize, false);
+      }
+
+      // Fonction appelée à chaque redimensionnement de la fenêtre.
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight; // Mise à jour du rapport largeur/hauteur de la caméra.
+        camera.updateProjectionMatrix(); // Mise à jour de la matrice de projection de la caméra.
+        renderer.setSize(window.innerWidth, window.innerHeight); // Mise à jour de la taille du rendu.
+      }
+
+      // Fonction d'animation appelée à chaque frame pour redessiner la scène.
+      function animate() {
+        requestAnimationFrame(animate); // Demande de rappel de la fonction animate pour la prochaine frame.
+        renderer.render(scene, camera); // Dessin de la scène avec la caméra spécifiée.
+      }
+
+      // Appel de la fonction init pour démarrer le programme.
+      init();
+    </script>
+  </body>
+</html>
